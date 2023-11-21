@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+</head>
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 50px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        max-width: 258px;
+    }
+
+    p.text {
+        text-align: end;
+        margin: 0;
+        user-select: none
+        
+    }
+
+    .calculator-display {
+        position: relative;
+        margin-bottom: 5px;
+        border: 1px solid gainsboro;
+        padding: 15px;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        justify-content: end;
+        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    }
+
+    .calculator-display div {
+        height: 20px;
+    }
+
+    .calculator-buttons {
+        display: grid;
+        max-width: fit-content;
+        grid-template-columns: repeat(4, 50px);
+        grid-gap: 2px;
+    }
+
+    .calculator-buttons span {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid gainsboro;
+        border-radius: 5px;
+        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+        transition: 0.3s ease-in-out;
+        user-select: none;
+        cursor: pointer
+    }
+
+    .calculator-buttons span:hover {
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    .past-display span {
+        position: absolute;
+        left: 15px;
+        top: 15px;
+        font-weight: 900;
+    }
+
+</style>
+<body>
+    <div class="container">
+        <div class="calculator-display">
+            <div class="past-display">
+                <p class="text"></p><span id="operator"></span>
+            </div>
+            <div class="current-display">
+                <p class="text"></p>
+            </div>
+        </div>
+        <div class="calculator-buttons">
+            <span data-type="number">0</span>
+            <span data-type="number">1</span>
+            <span data-type="number">2</span>
+            <span data-type="number">3</span>
+            <span data-type="number">4</span>
+            <span data-type="number">5</span>
+            <span data-type="number">6</span>
+            <span data-type="number">7</span>
+            <span data-type="number">8</span>
+            <span data-type="number">9</span>
+            <span data-type="number">.</span>
+            <span data-type="equal">=</span>
+            <span data-type="operation">+</span>
+            <span data-type="operation">-</span>
+            <span data-type="operation">*</span>
+            <span data-type="operation">:</span>
+            <span data-type="clear">AC</span>
+            <span data-type="delete">DEL</span>
+        </div>
+    </div>
+</body>
+<script>
+    const numbersBtns = document.querySelectorAll('[data-type="number"]')
+    const currDisplay = document.querySelector('.current-display p')
+    const prevDisplay = document.querySelector('.past-display p')
+    const equalBtn = document.querySelector('[data-type="equal"]')
+    const operationBtns = document.querySelectorAll('[data-type="operation"]')
+    const clearButton = document.querySelector('[data-type="clear"]')
+    const deleteButton = document.querySelector('[data-type="delete"]')
+    const operatorDisplay = document.querySelector('#operator')
+
+    let currentNumbers = '';
+    let prevNumbers = '';
+    let operation = '';
+
+    function clear() {
+        currentNumbers = ''
+        prevNumbers = ''
+        operation = ''
+        currDisplay.innerText = currentNumbers
+        prevDisplay.innerText = prevNumbers
+        operatorDisplay.innerText = operation
+    }
+
+    function deleteNumber() {
+        // currentNumbers = currentNumbers.split('')
+        // currentNumbers.pop()
+        // currentNumbers = currentNumbers.join('')
+        currentNumbers = currentNumbers.slice(0, -1)
+        updateDisplay()
+    }
+
+    function chooseOperation() {
+        if (!currentNumbers) return
+        if (prevNumbers) {
+            computeNumbers()
+        }
+        operation = this.innerText
+        prevNumbers = currentNumbers
+        operator.innerText = operation
+        currentNumbers = ''
+        updateDisplay()
+    }
+
+    function appendNumber() {
+        if (this.innerText === '.' && currentNumbers.includes('.')) return
+        if (this.innerText === '0' && !currentNumbers) return
+        currentNumbers = currentNumbers + this.innerText
+        updateDisplay()
+    }
+
+    function computeNumbers() {
+        let computation 
+        const curr = parseFloat(currentNumbers)
+        const prev = parseFloat(prevNumbers)
+        if (!prev || !curr) return 
+        switch(operation){
+            case '+': 
+                computation = prev + curr
+                break
+            case '-': 
+                computation = prev - curr
+                break
+            case '*': 
+                computation = prev * curr
+                break
+            case ':': 
+                computation = prev / curr
+                break
+            default:
+                return
+        }
+        currentNumbers = computation
+        prevNumbers = ''
+        operation = ''
+        updateDisplay()
+    }
+
+    function updateDisplay() {
+        currDisplay.innerText = currentNumbers
+        prevDisplay.innerText = prevNumbers
+        operatorDisplay.innerText = operation
+    }
+
+    numbersBtns.forEach(number => number.onclick = appendNumber)
+    operationBtns.forEach(operation => operation.onclick = chooseOperation)
+    equalBtn.onclick = computeNumbers
+    clearButton.onclick = clear
+    deleteButton.onclick = deleteNumber
+</script>
+</html>
